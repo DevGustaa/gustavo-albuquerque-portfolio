@@ -41,7 +41,6 @@ export const en: Content = {
     tagline:
       "I work across the whole software lifecycle — requirements, architecture, development, infrastructure, deployment and maintenance — with a focus on security, data privacy (LGPD) and AI applications.",
     ctaProjects: "View projects",
-    ctaCv: "Download CV",
     ctaContact: "Get in touch",
   },
   about: {
@@ -234,7 +233,11 @@ export const en: Content = {
   contact: {
     title: "Let's talk?",
     subtitle: "I'm open to new opportunities and partnerships. Feel free to reach out.",
-    emailLabel: "Send an e-mail",
+    gmailLabel: "Send via Gmail",
+    copyLabel: "Copy e-mail",
+    copiedLabel: "Copied!",
+    copyErrorLabel: "Couldn't copy",
+    mailtoLabel: "or open in your e-mail app",
   },
   footer: { rights: "All rights reserved." },
 };

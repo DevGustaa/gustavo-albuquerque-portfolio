@@ -41,7 +41,6 @@ export const pt: Content = {
     tagline:
       "Atuo em todo o ciclo de vida do software — requisitos, arquitetura, desenvolvimento, infraestrutura, deploy e sustentação — com foco em segurança, LGPD e aplicações com IA.",
     ctaProjects: "Ver projetos",
-    ctaCv: "Baixar CV",
     ctaContact: "Fale comigo",
   },
   about: {
@@ -235,7 +234,11 @@ export const pt: Content = {
     title: "Vamos conversar?",
     subtitle:
       "Estou aberto a novas oportunidades e parcerias. Fique à vontade para entrar em contato.",
-    emailLabel: "Enviar e-mail",
+    gmailLabel: "Enviar pelo Gmail",
+    copyLabel: "Copiar e-mail",
+    copiedLabel: "Copiado!",
+    copyErrorLabel: "Não foi possível copiar",
+    mailtoLabel: "ou abrir no app de e-mail",
   },
   footer: { rights: "Todos os direitos reservados." },
 };

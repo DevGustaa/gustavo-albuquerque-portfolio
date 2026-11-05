@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Footer } from "@/components/Footer";
 import { About } from "@/components/sections/About";
-import { Contact } from "@/components/sections/Contact";
+import { Contact, gmailComposeUrl } from "@/components/sections/Contact";
 import { Experience } from "@/components/sections/Experience";
 import { Hero } from "@/components/sections/Hero";
 import { ProjectCard, projectHost } from "@/components/sections/ProjectCard";
@@ -28,7 +28,7 @@ const socials = [
 describe("Hero", () => {
   it("renders name, role and CTAs", () => {
     render(
-      <Hero data={pt.hero} name="Fulano" cvUrl="/cv.pdf" socials={socials} />,
+      <Hero data={pt.hero} name="Fulano" socials={socials} />,
     );
     expect(
       screen.getByRole("heading", { level: 1, name: "Fulano" }),
@@ -37,18 +37,15 @@ describe("Hero", () => {
       "href",
       "#projects",
     );
-    expect(screen.getByRole("link", { name: /Baixar CV/ })).toHaveAttribute(
-      "download",
-    );
+    expect(screen.queryByRole("link", { name: /CV/ })).toBeNull();
     expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
       "target",
       "_blank",
     );
   });
 
-  it("hides the CV button and socials when not provided", () => {
+  it("hides the socials when not provided", () => {
     render(<Hero data={pt.hero} name="Fulano" socials={[]} />);
-    expect(screen.queryByRole("link", { name: /Baixar CV/ })).toBeNull();
     expect(screen.queryByRole("list")).toBeNull();
   });
 });
@@ -572,12 +569,88 @@ describe("Experience", () => {
 });
 
 describe("Contact", () => {
-  it("renders a mailto link and external social links", () => {
+  const originalClipboard = Object.getOwnPropertyDescriptor(
+    navigator,
+    "clipboard",
+  );
+
+  function mockClipboard(writeText?: (text: string) => Promise<void>) {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: writeText ? { writeText } : undefined,
+    });
+  }
+
+  afterEach(() => {
+    vi.useRealTimers();
+    if (originalClipboard)
+      Object.defineProperty(navigator, "clipboard", originalClipboard);
+    else Reflect.deleteProperty(navigator, "clipboard");
+  });
+
+  it("opens Gmail compose in a new tab with the e-mail as recipient", () => {
     render(<Contact data={pt.contact} email="me@site.dev" socials={socials} />);
-    expect(screen.getByRole("link", { name: /Enviar e-mail/ })).toHaveAttribute(
+    const gmail = screen.getByRole("link", { name: /Enviar pelo Gmail/ });
+    expect(gmail).toHaveAttribute(
       "href",
-      "mailto:me@site.dev",
+      "https://mail.google.com/mail/?view=cm&fs=1&to=me%40site.dev",
     );
+    expect(gmail).toHaveAttribute("target", "_blank");
+    expect(gmail).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("keeps a mailto fallback for other e-mail apps", () => {
+    render(<Contact data={pt.contact} email="me@site.dev" socials={socials} />);
+    expect(
+      screen.getByRole("link", { name: "ou abrir no app de e-mail" }),
+    ).toHaveAttribute("href", "mailto:me@site.dev");
+  });
+
+  it("copies the e-mail, confirms it and resets after a moment", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    mockClipboard(writeText);
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    render(<Contact data={pt.contact} email="me@site.dev" socials={socials} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Copiar e-mail" }));
+    });
+    expect(writeText).toHaveBeenCalledWith("me@site.dev");
+    expect(screen.getByRole("button", { name: "Copiado!" })).toHaveAttribute(
+      "data-state",
+      "copied",
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Copiado!");
+    act(() => vi.advanceTimersByTime(2000));
+    expect(
+      screen.getByRole("button", { name: "Copiar e-mail" }),
+    ).toHaveAttribute("data-state", "idle");
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+  });
+
+  it("shows an error when the clipboard rejects", async () => {
+    mockClipboard(vi.fn().mockRejectedValue(new Error("denied")));
+    render(<Contact data={pt.contact} email="me@site.dev" socials={socials} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Copiar e-mail" }));
+    });
+    expect(
+      screen.getByRole("button", { name: "Não foi possível copiar" }),
+    ).toHaveAttribute("data-state", "error");
+  });
+
+  it("shows an error when the clipboard API is unavailable", async () => {
+    mockClipboard(undefined);
+    render(<Contact data={pt.contact} email="me@site.dev" socials={socials} />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Copiar e-mail" }));
+    });
+    expect(
+      screen.getByRole("button", { name: "Não foi possível copiar" }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders external social links", () => {
+    render(<Contact data={pt.contact} email="me@site.dev" socials={socials} />);
     for (const social of socials) {
       const link = screen.getByRole("link", { name: social.label });
       expect(link).toHaveAttribute("href", social.href);
@@ -588,6 +661,14 @@ describe("Contact", () => {
   it("hides the socials list when empty", () => {
     render(<Contact data={pt.contact} email="me@site.dev" socials={[]} />);
     expect(screen.queryByRole("list")).toBeNull();
+  });
+});
+
+describe("gmailComposeUrl", () => {
+  it("encodes special characters in the address", () => {
+    expect(gmailComposeUrl("a+b@x.dev")).toBe(
+      "https://mail.google.com/mail/?view=cm&fs=1&to=a%2Bb%40x.dev",
+    );
   });
 });
 
