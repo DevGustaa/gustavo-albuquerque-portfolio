@@ -8,12 +8,11 @@ Todo o conteúdo fica em `src/content/`:
 
 | Arquivo | O que contém |
 | --- | --- |
-| `profile.ts` | Nome, e-mail, links sociais, caminho do CV e foto (dados que não mudam por idioma) |
+| `profile.ts` | Nome, e-mail, links sociais e foto (dados que não mudam por idioma) |
 | `pt.ts` / `en.ts` | Textos em português e inglês (hero, sobre, skills, projetos, experiência, contato) |
 
 Os dois idiomas precisam ter a mesma estrutura — um teste garante isso.
 
-- **CV:** substitua `public/cv.pdf`.
 - **Foto:** coloque a imagem em `public/` e defina `photoUrl: "/sua-foto.jpg"` em `profile.ts`.
 
 ## Scripts

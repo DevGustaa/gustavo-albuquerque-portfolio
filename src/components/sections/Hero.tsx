@@ -1,4 +1,4 @@
-import { ArrowRight, Download } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { Content, SocialLink } from "@/content";
 import { HeroBackground } from "../fx/HeroBackground";
 import { Typewriter } from "../fx/Typewriter";
@@ -9,13 +9,12 @@ import { buttonStyles } from "../ui/styles";
 interface HeroProps {
   data: Content["hero"];
   name: string;
-  cvUrl?: string;
   socials: SocialLink[];
 }
 
 const stagger = (step: number) => ({ animationDelay: `${step * 120}ms` });
 
-export function Hero({ data, name, cvUrl, socials }: HeroProps) {
+export function Hero({ data, name, socials }: HeroProps) {
   return (
     <section id="top" className="relative isolate overflow-hidden">
       <HeroBackground />
@@ -24,7 +23,10 @@ export function Hero({ data, name, cvUrl, socials }: HeroProps) {
           className="inline-flex animate-fade-up items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 font-mono text-sm text-brand-700 dark:text-brand-300"
           style={stagger(0)}
         >
-          <span aria-hidden="true" className="h-2 w-2 animate-pulse-ring rounded-full bg-accent-400" />
+          <span
+            aria-hidden="true"
+            className="h-2 w-2 animate-pulse-ring rounded-full bg-accent-400"
+          />
           {data.greeting}
         </p>
         <h1
@@ -37,7 +39,10 @@ export function Hero({ data, name, cvUrl, socials }: HeroProps) {
           className="mt-3 min-h-[1.5em] animate-fade-up text-2xl font-semibold text-zinc-600 sm:text-3xl dark:text-zinc-300"
           style={stagger(2)}
         >
-          <span aria-hidden="true" className="mr-2 font-mono text-accent-600 dark:text-accent-400">
+          <span
+            aria-hidden="true"
+            className="mr-2 font-mono text-accent-600 dark:text-accent-400"
+          >
             &gt;
           </span>
           <Typewriter words={data.roles} label={data.role} />
@@ -49,7 +54,10 @@ export function Hero({ data, name, cvUrl, socials }: HeroProps) {
           {data.tagline}
         </p>
 
-        <div className="mt-10 flex animate-fade-up flex-wrap gap-3" style={stagger(4)}>
+        <div
+          className="mt-10 flex animate-fade-up flex-wrap gap-3"
+          style={stagger(4)}
+        >
           <a href="#projects" className={`${buttonStyles.primary} group`}>
             {data.ctaProjects}
             <ArrowRight
@@ -57,12 +65,6 @@ export function Hero({ data, name, cvUrl, socials }: HeroProps) {
               className="h-4 w-4 transition-transform group-hover:translate-x-1"
             />
           </a>
-          {cvUrl && (
-            <a href={cvUrl} download className={buttonStyles.secondary}>
-              <Download aria-hidden="true" className="h-4 w-4" />
-              {data.ctaCv}
-            </a>
-          )}
           <a href="#contact" className={buttonStyles.ghost}>
             {data.ctaContact}
           </a>

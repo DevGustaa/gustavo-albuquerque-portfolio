@@ -79,7 +79,6 @@ export interface Content {
     roles: string[];
     tagline: string;
     ctaProjects: string;
-    ctaCv: string;
     ctaContact: string;
   };
   about: {
@@ -105,6 +104,14 @@ export interface Content {
   };
   projects: { title: string; subtitle: string; items: Project[] };
   experience: { title: string; subtitle: string; items: ExperienceItem[] };
-  contact: { title: string; subtitle: string; emailLabel: string };
+  contact: {
+    title: string;
+    subtitle: string;
+    gmailLabel: string;
+    copyLabel: string;
+    copiedLabel: string;
+    copyErrorLabel: string;
+    mailtoLabel: string;
+  };
   footer: { rights: string };
 }
